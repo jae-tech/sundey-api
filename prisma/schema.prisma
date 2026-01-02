@@ -1,0 +1,168 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+model User {
+  id                   String        @id @default(uuid())
+  email                String        @unique
+  password             String
+  name                 String
+  role                 UserRole      @default(STAFF)
+  companyId            String        @map("company_id")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+  assignedReservations Reservation[] @relation("AssignedUser")
+  company              Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("users")
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  name         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  customers    Customer[]
+  invitations  Invitation[]
+  reservations Reservation[]
+  services     Service[]
+  users        User[]
+
+  @@map("companies")
+}
+
+model Invitation {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String
+  role      UserRole @default(STAFF)
+  companyId String   @map("company_id")
+  isUsed    Boolean  @default(false) @map("is_used")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("invitations")
+}
+
+model Customer {
+  id           String        @id @default(uuid())
+  name         String
+  phone        String
+  email        String?
+  companyId    String        @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+
+  @@unique([phone, companyId])
+  @@map("customers")
+}
+
+model Service {
+  id           String        @id @default(uuid())
+  name         String
+  description  String        @default("")
+  price        Int
+  duration     Int           @default(60)
+  companyId    String        @map("company_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  reservations Reservation[]
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("services")
+}
+
+model Reservation {
+  id             String            @id @default(uuid())
+  companyId      String            @map("company_id")
+  customerId     String?           @map("customer_id")
+  serviceId      String            @map("service_id")
+  assignedUserId String?           @map("assigned_user_id")
+  status         ReservationStatus @default(PENDING_INQUIRY)
+  scheduledAt    DateTime          @map("scheduled_at")
+  startedAt      DateTime?         @map("started_at")
+  completedAt    DateTime?         @map("completed_at")
+  customerName   String            @map("customer_name")
+  customerPhone  String            @map("customer_phone")
+  customerEmail  String?           @map("customer_email")
+  totalPrice     Int
+  paidAmount     Int               @default(0) @map("paid_amount")
+  isPaid         Boolean           @default(false) @map("is_paid")
+  paymentNote    String?           @map("payment_note")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  assignedUser   User?             @relation("AssignedUser", fields: [assignedUserId], references: [id])
+  company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer       Customer?         @relation(fields: [customerId], references: [id])
+  service        Service           @relation(fields: [serviceId], references: [id])
+  job            Job?
+
+  @@map("reservations")
+}
+
+model Job {
+  id            String     @id @default(uuid())
+  reservationId String     @unique @map("reservation_id")
+  status        JobStatus  @default(PENDING)
+  photos        JobPhoto[]
+  startedAt     DateTime?  @map("started_at")
+  completedAt   DateTime?  @map("completed_at")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@map("jobs")
+}
+
+model JobPhoto {
+  id         String    @id @default(uuid())
+  jobId      String    @map("job_id")
+  type       PhotoType
+  photoUrl   String    @map("photo_url")
+  fileName   String    @map("file_name")
+  uploadedBy String?   @map("uploaded_by")
+  uploadedAt DateTime  @default(now()) @map("uploaded_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("job_photos")
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum ReservationStatus {
+  PENDING_INQUIRY
+  CONFIRMED
+  WORKING
+  DONE
+  CANCELLED
+  NO_SHOW
+}
+
+enum JobStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PhotoType {
+  BEFORE
+  AFTER
+}
