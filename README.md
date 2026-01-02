@@ -110,6 +110,7 @@ pnpm run dev
 ```
 
 서버가 실행되면:
+
 - API: http://localhost:3000
 - Swagger 문서: http://localhost:3000/api
 - 모든 로그는 한글로 출력됩니다
@@ -131,6 +132,7 @@ docker-compose down -v
 ```
 
 Docker Compose로 실행하면:
+
 - Nginx (Reverse Proxy): http://localhost:80
 - API: http://localhost:3000
 - Swagger: http://localhost:3000/api
@@ -210,27 +212,33 @@ npx prisma studio
 ### 주요 엔드포인트
 
 #### Auth
+
 - `POST /auth/register` - 회원가입
 - `POST /auth/login` - 로그인
 
 #### Users
+
 - `GET /users/me` - 현재 사용자 정보
 - `GET /users/:id` - 사용자 조회
 - `GET /users/company/:companyId` - 회사별 사용자 목록
 
 #### Invitations
+
 - `POST /invitations` - 초대장 생성 (OWNER only)
 - `POST /invitations/accept` - 초대 수락
 
 #### Customers
+
 - `POST /customers` - 고객 생성
 - `GET /customers/company/:companyId` - 회사별 고객 목록
 
 #### Services
+
 - `POST /services` - 서비스 생성
 - `GET /services/company/:companyId` - 회사별 서비스 목록
 
 #### Reservations
+
 - `POST /reservations` - 예약 생성
 - `POST /reservations/:id/confirm` - 예약 확정 (고객 자동 생성)
 - `PATCH /reservations/:id/assign` - 직원 배정
@@ -304,14 +312,14 @@ pnpm run lint
 
 ### 로그 레벨
 
-| 레벨 | 값 | 용도 |
-|------|---|----|
-| **트레이스** | 10 | 매우 상세한 디버깅 정보 |
-| **디버그** | 20 | 개발 중 디버깅 정보 |
-| **정보** | 30 | 일반적인 정보성 메시지 |
-| **경고** | 40 | 경고 메시지 |
-| **에러** | 50 | 에러 메시지 |
-| **심각** | 60 | 심각한 에러 |
+| 레벨         | 값  | 용도                    |
+| ------------ | --- | ----------------------- |
+| **트레이스** | 10  | 매우 상세한 디버깅 정보 |
+| **디버그**   | 20  | 개발 중 디버깅 정보     |
+| **정보**     | 30  | 일반적인 정보성 메시지  |
+| **경고**     | 40  | 경고 메시지             |
+| **에러**     | 50  | 에러 메시지             |
+| **심각**     | 60  | 심각한 에러             |
 
 ### 환경별 로그 레벨
 
