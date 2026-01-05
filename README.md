@@ -27,15 +27,17 @@ modules/<domain>/
 ## 기술 스택
 
 - **Framework**: NestJS (Fastify)
-- **Database**: PostgreSQL
-- **ORM**: Prisma 5.22
+- **Database**: PostgreSQL + Prisma v7.2.0 (PrismaPg adapter)
+- **ORM**: Prisma v7.2.0 (Prisma Data Platform)
+- **Database Adapter**: @prisma/adapter-pg
 - **Cache**: Redis
 - **Queue**: BullMQ
 - **Authentication**: JWT + Refresh Token
-- **Logging**: Pino (구조화된 JSON 로깅)
+- **Logging**: Pino (구조화된 JSON 로깅) + nestjs-pino
 - **Validation**: class-validator, class-transformer
 - **Documentation**: Swagger (OpenAPI)
-- **Container**: Docker, Docker Compose
+- **Container**: Docker, Docker Compose (로컬/프로덕션 환경 분리)
+- **Build**: tsup (ESM, Tree-shaking disabled)
 
 ## 프로젝트 구조
 
@@ -117,8 +119,13 @@ pnpm run dev
 
 ### 3. Docker로 실행
 
+#### 로컬 개발 환경
+
 ```bash
-# 모든 서비스 시작 (API, PostgreSQL, Redis, Worker, Nginx)
+# 환경변수 파일 생성
+cp .env.example .env
+
+# 모든 서비스 시작 (docker-compose.yml + docker-compose.override.yml 자동 병합)
 docker-compose up -d
 
 # 로그 확인
@@ -127,17 +134,58 @@ docker-compose logs -f api
 # 서비스 중지
 docker-compose down
 
-# 볼륨까지 삭제
+# 볼륨까지 삭제 (데이터 초기화)
 docker-compose down -v
 ```
 
-Docker Compose로 실행하면:
+**로컬 개발 환경의 특징:**
+- ✅ Hot reload 활성화 (코드 변경 시 자동 재시작)
+- ✅ 외부 포트 노출: 5432 (PostgreSQL), 6379 (Redis), 4000 (API)
+- ✅ Nginx 미사용 (API에 직접 접근)
+- ✅ 로컬 코드 마운트 (볼륨 연결)
+- ✅ 개발 모드 실행
 
-- Nginx (Reverse Proxy): http://localhost:80
-- API: http://localhost:3000
-- Swagger: http://localhost:3000/api
+로컬 환경에서 접속:
+- API: http://localhost:4000
+- Swagger: http://localhost:4000/api
 - PostgreSQL: localhost:5432
 - Redis: localhost:6379
+
+#### 프로덕션 환경
+
+```bash
+# 프로덕션 환경변수 파일 생성
+cp .env.example .env.production
+# .env.production 수정 필요
+
+# Docker 이미지 빌드 (실제 DATABASE_URL과 함께)
+export DB_URL=$(grep "^DATABASE_URL=" .env.production | cut -d= -f2)
+docker build --build-arg DATABASE_URL="$DB_URL" -t sundey-api:latest .
+
+# 프로덕션 서비스 시작 (docker-compose.yml + docker-compose.prod.yml 병합)
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# 프로덕션 로그 확인
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f api
+
+# 프로덕션 서비스 중지
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+```
+
+**프로덕션 환경의 특징:**
+- ✅ 미리 빌드된 이미지 사용
+- ✅ Nginx reverse proxy (80, 443 포트)
+- ✅ DB/Redis 내부 포트만 사용 (외부 노출 안 함)
+- ✅ 자동 재시작 정책 (restart: always)
+- ✅ 로그 로테이션 설정 (10MB마다 순환)
+- ✅ 최소 리소스 사용
+
+프로덕션 환경에서 접속:
+- Nginx (Reverse Proxy): http://localhost:80
+- API (내부): http://localhost:3000
+- Swagger: http://localhost/api
+
+**자세한 Docker Compose 설정 가이드는 [DOCKER_COMPOSE.md](./DOCKER_COMPOSE.md) 참고**
 
 ## 주요 기능
 
@@ -332,7 +380,7 @@ pnpm run lint
 
 ```typescript
 // 예제
-logger.info(`파일 업로드 성공: ${objectName}`);
+logger.log(`파일 업로드 성공: ${objectName}`);
 logger.warn(`설정이 완료되지 않았습니다`);
 logger.error(`파일 업로드 실패: ${error.message}`);
 ```
@@ -350,19 +398,105 @@ export class MyService {
   }
 
   doSomething() {
-    this.logger.info(`작업 시작`);
+    this.logger.log(`작업 시작`);
     // ...
     this.logger.error(`작업 실패: ${error.message}`);
   }
 }
 ```
 
-## 트러블슈팅
+## Prisma v7.2.0 마이그레이션
 
-### Prisma Client 오류
+### PrismaPg Adapter 패턴
+
+Prisma v7.2.0부터는 PostgreSQL 연결 시 **반드시 PrismaPg adapter**를 사용해야 합니다.
+
+#### PrismaService 초기화 패턴
+
+```typescript
+import { PrismaClient } from '@prisma-client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Client } from 'pg';
+
+async onModuleInit(): Promise<void> {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  // PostgreSQL 클라이언트 생성
+  const client = new Client({
+    connectionString: databaseUrl,
+  });
+
+  // PrismaPg 어댑터 생성
+  const adapter = new PrismaPg(client);
+
+  // PrismaClient 생성 (반드시 adapter 옵션 필요)
+  this.prismaClient = new PrismaClient({ adapter });
+
+  // 연결 확인
+  await this.prismaClient.$connect();
+}
+```
+
+**중요 사항:**
+- `new PrismaClient(){ adapter }` - adapter 필수
+- `new PrismaClient()` 또는 `new PrismaClient({})` - 불가능
+- Prisma Schema에 `engineType` 설정 금지
+
+### Prisma Client 생성 오류
 
 ```bash
+# Prisma Client 재생성
 npx prisma generate
+
+# 또는 캐시 초기화 후 재생성
+rm -rf node_modules/.prisma
+pnpm install
+npx prisma generate
+```
+
+### Docker 빌드 시 DATABASE_URL 오류
+
+```bash
+# 빌드 인자로 DATABASE_URL 전달 필요
+docker build \
+  --build-arg DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  -t sundey-api:latest .
+```
+
+## 트러블슈팅
+
+### Docker Compose 포트 충돌
+
+```bash
+# 포트 사용 프로세스 확인 (Windows)
+netstat -ano | findstr :4000
+
+# Docker 캐시 초기화 및 정리
+docker-compose down -v
+docker system prune -a
+```
+
+### 데이터베이스 연결 실패
+
+```bash
+# PostgreSQL 컨테이너 로그 확인
+docker-compose logs postgres
+
+# 컨테이너 재시작
+docker-compose restart postgres
+
+# 수동 연결 테스트
+docker-compose exec postgres psql -U sundey -d sundey_crm
+```
+
+### 마이그레이션 오류
+
+```bash
+# 프로덕션 환경에서 마이그레이션 수동 실행
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec api npx prisma migrate deploy
+
+# 마이그레이션 상태 확인
+npx prisma migrate status
 ```
 
 ### TypeScript Path Alias 오류
@@ -371,20 +505,123 @@ npx prisma generate
 
 ```json
 {
-  "paths": {
-    "@/*": ["src/*"],
-    "@common/*": ["src/common/*"],
-    "@core/*": ["src/core/*"],
-    "@modules/*": ["src/modules/*"],
-    "@configs/*": ["src/configs/*"]
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["src/*"],
+      "@common/*": ["src/common/*"],
+      "@core/*": ["src/core/*"],
+      "@modules/*": ["src/modules/*"],
+      "@configs/*": ["src/configs/*"]
+    }
   }
 }
 ```
 
+**중요:** path alias 설정이 필요함
+- ✅ `import { PrismaClient } from '@prisma-client'` (path alias 사용)
+- ❌ `import { PrismaClient } from '@prisma/client'` (직접 npm 패키지 사용 금지)
+
+`tsconfig.json`에 다음과 같이 path alias를 설정해야 합니다:
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@prisma-client": ["node_modules/@prisma/client"]
+    }
+  }
+}
+```
+
+## 설치 및 구성 가이드
+
+### 필수 요소
+
+- **Node.js**: v20.x 이상
+- **pnpm**: v8.x 이상
+- **Docker & Docker Compose**: 최신 버전
+- **PostgreSQL**: 별도 설치 또는 Docker 컨테이너
+- **Redis**: 별도 설치 또는 Docker 컨테이너
+
+### 초기 설정
+
+```bash
+# 1. 의존성 설치
+pnpm install
+
+# 2. 환경변수 설정
+cp .env.example .env
+# .env 파일 수정 (DATABASE_URL, JWT_SECRET 등)
+
+# 3. Prisma Client 생성
+npx prisma generate
+
+# 4. 데이터베이스 마이그레이션
+npx prisma migrate dev --name init
+
+# 5. 개발 서버 실행
+pnpm run dev
+```
+
+### 환경변수 설정 예제
+
+```bash
+# 로컬 개발 환경 (.env)
+NODE_ENV=development
+PORT=4000
+DATABASE_URL=postgresql://sundey:sundey123@localhost:5432/sundey_crm?schema=public
+JWT_SECRET=dev-secret-key-32-chars-minimum
+JWT_EXPIRES_IN=3600
+JWT_REFRESH_SECRET=dev-refresh-secret-key
+JWT_REFRESH_EXPIRES_IN=604800
+REDIS_HOST=localhost
+REDIS_PORT=6379
+BULL_QUEUE_NAME=sundey-queue
+CORS_ORIGIN=http://localhost:3000
+```
+
+## 파일 구조 및 역할
+
+### 핵심 설정 파일
+
+| 파일 | 역할 |
+|------|------|
+| `docker-compose.yml` | 기본 Docker Compose 설정 |
+| `docker-compose.override.yml` | 로컬 개발 환경 오버라이드 (자동 적용) |
+| `docker-compose.prod.yml` | 프로덕션 환경 오버라이드 (명시적 지정) |
+| `Dockerfile` | 프로덕션 Docker 이미지 빌드 |
+| `prisma/schema.prisma` | 데이터베이스 스키마 정의 |
+| `.env` | 로컬 개발 환경변수 |
+| `CLAUDE.md` | Claude Code 개발 가이드 |
+| `DOCKER_COMPOSE.md` | Docker Compose 상세 가이드 |
+
+### 프로젝트 초기화 이력
+
+이 프로젝트는 다음 작업을 통해 구성되었습니다:
+
+1. **Clean/Hexagonal Architecture** 구축
+   - Port & Adapter 패턴 구현
+   - 레이어별 의존성 규칙 적용
+
+2. **Docker Compose 환경 분리**
+   - 로컬 개발 환경 (hot reload, 외부 포트 노출)
+   - 프로덕션 환경 (Nginx, 내부 포트, 자동 재시작)
+   - [DOCKER_COMPOSE.md](./DOCKER_COMPOSE.md) 참조
+
+3. **Prisma v7.2.0 마이그레이션**
+   - PrismaPg adapter 패턴 도입
+   - Database URL 런타임 초기화
+   - Dockerfile에 빌드 인자 추가
+
+4. **Pino 로깅 시스템**
+   - JSON 구조화 로깅
+   - 환경별 로그 레벨 설정
+   - 한글 로그 메시지 지원
+
+5. **Fastify + NestJS 통합**
+   - JWT 기반 인증
+   - Swagger API 문서
+   - 전역 예외 처리
+
 ## 라이센스
 
 UNLICENSED
-
-## 프로젝트 생성 완료
-
-Sundey CRM Backend 프로젝트가 성공적으로 생성되었습니다!
