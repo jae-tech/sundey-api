@@ -1,27 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class CreateServiceDto {
-  @ApiProperty({ example: 'Haircut' })
-  @IsString()
-  name: string;
+export const CreateServiceSchema = z.object({
+  name: z.string().min(1, { message: 'Service name is required' }).describe('Service name'),
+  description: z.string().optional().describe('Service description'),
+  price: z.number().min(0, { message: 'Price must be non-negative' }).describe('Service price'),
+  duration: z.number().min(1, { message: 'Duration must be at least 1 minute' }).describe('Duration in minutes'),
+  companyId: z.string().min(1, { message: 'Company ID is required' }).describe('Company ID'),
+});
 
-  @ApiProperty({ example: 'Basic haircut service', required: false })
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @ApiProperty({ example: 30000 })
-  @IsNumber()
-  @Min(0)
-  price: number;
-
-  @ApiProperty({ example: 60, description: 'Duration in minutes' })
-  @IsNumber()
-  @Min(1)
-  duration: number;
-
-  @ApiProperty({ example: 'company-uuid' })
-  @IsString()
-  companyId: string;
-}
+export class CreateServiceDto extends createZodDto(CreateServiceSchema) {}

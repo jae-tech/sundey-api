@@ -14,8 +14,11 @@ RUN pnpm install --frozen-lockfile
 # Copy source files
 COPY . .
 
+# Build argument for DATABASE_URL (placeholder for prisma generate)
+ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
+
 # Generate Prisma Client
-RUN npx prisma generate
+RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
 # Build application
 RUN pnpm run build
@@ -37,7 +40,9 @@ RUN pnpm install --prod --frozen-lockfile
 # Copy built application
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Generate Prisma Client in production stage
+RUN DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder npx prisma generate
 
 # Expose port
 EXPOSE 3000

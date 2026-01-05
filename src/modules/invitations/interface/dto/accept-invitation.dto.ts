@@ -1,18 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class AcceptInvitationDto {
-  @ApiProperty({ example: 'invitation-token-uuid' })
-  @IsString()
-  token: string;
+export const AcceptInvitationSchema = z.object({
+  token: z.string().min(1, { message: 'Token is required' }).describe('Invitation token'),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }).describe('User password'),
+  name: z.string().min(2, { message: 'Name must be at least 2 characters' }).describe('User full name'),
+});
 
-  @ApiProperty({ example: 'password123' })
-  @IsString()
-  @MinLength(6)
-  password: string;
-
-  @ApiProperty({ example: 'John Doe' })
-  @IsString()
-  @MinLength(2)
-  name: string;
-}
+export class AcceptInvitationDto extends createZodDto(AcceptInvitationSchema) {}

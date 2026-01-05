@@ -1,0 +1,74 @@
+# 프로덕션 환경 설정
+# docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d 로 실행
+
+version: "3.8"
+
+services:
+  postgres:
+    restart: always
+    # 프로덕션에서는 외부 포트 노출 금지
+    ports: []
+
+  redis:
+    restart: always
+    # 프로덕션에서는 외부 포트 노출 금지
+    ports: []
+
+  api:
+    restart: always
+    # 프로덕션에서는 로컬 코드 마운트 금지
+    volumes: []
+    # 프로덕션에서는 이미 빌드된 이미지 사용 (빌드 스킵)
+    build: false
+    image: sundey-api:latest
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DEBUG: "false"
+    # 프로덕션에서는 내부 포트만 사용
+    ports:
+      - "3000:3000"
+    # 자동 재시작 정책
+    restart: always
+    # 로그 관리
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  worker:
+    restart: always
+    build: false
+    image: sundey-api:latest
+    environment:
+      NODE_ENV: production
+      DEBUG: "false"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: sundey-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    # 프로덕션에서는 SSL 인증서 마운트 (옵션)
+    # volumes:
+    #   - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    #   - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - api
+    networks:
+      - sundey-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class AssignUserDto {
-  @ApiProperty({ example: 'user-uuid' })
-  @IsString()
-  assignedUserId: string;
-}
+export const AssignUserSchema = z.object({
+  assignedUserId: z.string().min(1, { message: 'Assigned user ID is required' }).describe('User ID to assign'),
+});
+
+export class AssignUserDto extends createZodDto(AssignUserSchema) {}

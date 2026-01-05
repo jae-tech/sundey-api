@@ -57,6 +57,7 @@ model Customer {
   phone        String
   email        String?
   companyId    String        @map("company_id")
+  metadata     Json          @default("{}") @map("metadata")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -82,29 +83,32 @@ model Service {
 }
 
 model Reservation {
-  id             String            @id @default(uuid())
-  companyId      String            @map("company_id")
-  customerId     String?           @map("customer_id")
-  serviceId      String            @map("service_id")
-  assignedUserId String?           @map("assigned_user_id")
-  status         ReservationStatus @default(PENDING_INQUIRY)
-  scheduledAt    DateTime          @map("scheduled_at")
-  startedAt      DateTime?         @map("started_at")
-  completedAt    DateTime?         @map("completed_at")
-  customerName   String            @map("customer_name")
-  customerPhone  String            @map("customer_phone")
-  customerEmail  String?           @map("customer_email")
+  id             String                   @id @default(uuid())
+  companyId      String                   @map("company_id")
+  customerId     String?                  @map("customer_id")
+  serviceId      String?                  @map("service_id")
+  assignedUserId String?                  @map("assigned_user_id")
+  status         ReservationStatus        @default(PENDING_INQUIRY)
+  scheduledAt    DateTime                 @map("scheduled_at")
+  startedAt      DateTime?                @map("started_at")
+  completedAt    DateTime?                @map("completed_at")
+  customerName   String                   @map("customer_name")
+  customerPhone  String                   @map("customer_phone")
+  customerEmail  String?                  @map("customer_email")
   totalPrice     Int
-  paidAmount     Int               @default(0) @map("paid_amount")
-  isPaid         Boolean           @default(false) @map("is_paid")
-  paymentNote    String?           @map("payment_note")
-  createdAt      DateTime          @default(now()) @map("created_at")
-  updatedAt      DateTime          @updatedAt @map("updated_at")
-  assignedUser   User?             @relation("AssignedUser", fields: [assignedUserId], references: [id])
-  company        Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  customer       Customer?         @relation(fields: [customerId], references: [id])
-  service        Service           @relation(fields: [serviceId], references: [id])
+  paidAmount     Int                      @default(0) @map("paid_amount")
+  isPaid         Boolean                  @default(false) @map("is_paid")
+  paymentNote    String?                  @map("payment_note")
+  items          Json                     @default("[]") @map("items")
+  metadata       Json                     @default("{}") @map("metadata")
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+  assignedUser   User?                    @relation("AssignedUser", fields: [assignedUserId], references: [id])
+  company        Company                  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer       Customer?                @relation(fields: [customerId], references: [id])
+  service        Service?                 @relation(fields: [serviceId], references: [id])
   job            Job?
+  statusLogs     ReservationStatusLog[]
 
   @@map("reservations")
 }
@@ -140,6 +144,21 @@ model JobPhoto {
   @@map("job_photos")
 }
 
+model ReservationStatusLog {
+  id              String            @id @default(uuid())
+  reservationId   String            @map("reservation_id")
+  previousStatus  ReservationStatus @map("previous_status")
+  newStatus       ReservationStatus @map("new_status")
+  changedByUserId String            @map("changed_by_user_id")
+  reason          String?           @map("reason")
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  @@index([reservationId])
+  @@map("reservation_status_logs")
+}
+
 enum UserRole {
   OWNER
   MANAGER
@@ -165,4 +184,11 @@ enum JobStatus {
 enum PhotoType {
   BEFORE
   AFTER
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  MOBILE_PAY
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '@prisma-client';
+import { UserRole } from '@prisma/client';
 import { PrismaService } from '@modules/queue/infrastructure/prisma.service';
 import { IInvitationRepository } from '@core/ports/invitation.repository.port';
 import { Invitation } from '../domain/invitation.entity';

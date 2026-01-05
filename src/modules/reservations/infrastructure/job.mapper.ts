@@ -1,4 +1,4 @@
-import { Job as PrismaJob, JobPhoto as PrismaJobPhoto } from '@prisma-client';
+import { Job as PrismaJob, JobPhoto as PrismaJobPhoto } from '@prisma/client';
 import { Job, JobPhoto, JobStatus, PhotoType } from '../domain/job.entity';
 
 export class JobMapper {

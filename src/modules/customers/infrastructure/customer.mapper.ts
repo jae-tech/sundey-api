@@ -1,5 +1,6 @@
-import { Customer as PrismaCustomer } from '@prisma-client';
+import { Customer as PrismaCustomer } from '@prisma/client';
 import { Customer } from '../domain/customer.entity';
+import { CustomerMetadata } from '../domain/customer-metadata.interface';
 
 export class CustomerMapper {
   static toDomain(raw: PrismaCustomer): Customer {
@@ -12,6 +13,7 @@ export class CustomerMapper {
       customer.email ?? undefined,
       customer.createdAt,
       customer.updatedAt,
+      (customer.metadata as CustomerMetadata) || {},
     );
   }
 }

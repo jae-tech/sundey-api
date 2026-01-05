@@ -440,9 +440,9 @@ export type ServiceSumOrderByAggregateInput = {
   duration?: Prisma.SortOrder
 }
 
-export type ServiceScalarRelationFilter = {
-  is?: Prisma.ServiceWhereInput
-  isNot?: Prisma.ServiceWhereInput
+export type ServiceNullableScalarRelationFilter = {
+  is?: Prisma.ServiceWhereInput | null
+  isNot?: Prisma.ServiceWhereInput | null
 }
 
 export type ServiceCreateNestedManyWithoutCompanyInput = {
@@ -501,10 +501,12 @@ export type ServiceCreateNestedOneWithoutReservationsInput = {
   connect?: Prisma.ServiceWhereUniqueInput
 }
 
-export type ServiceUpdateOneRequiredWithoutReservationsNestedInput = {
+export type ServiceUpdateOneWithoutReservationsNestedInput = {
   create?: Prisma.XOR<Prisma.ServiceCreateWithoutReservationsInput, Prisma.ServiceUncheckedCreateWithoutReservationsInput>
   connectOrCreate?: Prisma.ServiceCreateOrConnectWithoutReservationsInput
   upsert?: Prisma.ServiceUpsertWithoutReservationsInput
+  disconnect?: Prisma.ServiceWhereInput | boolean
+  delete?: Prisma.ServiceWhereInput | boolean
   connect?: Prisma.ServiceWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ServiceUpdateToOneWithWhereWithoutReservationsInput, Prisma.ServiceUpdateWithoutReservationsInput>, Prisma.ServiceUncheckedUpdateWithoutReservationsInput>
 }

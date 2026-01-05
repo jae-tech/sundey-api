@@ -1,30 +1,12 @@
-import { IsString, IsEnum, IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class GeneratePresignedUrlDto {
-  @ApiProperty({
-    example: 'photo.jpg',
-    description: 'File name to upload',
-  })
-  @IsString()
-  @IsNotEmpty()
-  fileName: string;
+export const GeneratePresignedUrlSchema = z.object({
+  fileName: z.string().min(1, { message: 'File name is required' }).describe('File name to upload'),
+  mimeType: z.string().min(1, { message: 'MIME type is required' }).describe('MIME type of the file (image/jpeg, image/png, image/webp, image/heic)'),
+  type: z.enum(['before', 'after'], {
+    errorMap: () => ({ message: 'Type must be either "before" or "after"' })
+  }).describe('Type of photo (before or after cleaning)'),
+});
 
-  @ApiProperty({
-    example: 'image/jpeg',
-    description:
-      'MIME type of the file (image/jpeg, image/png, image/webp, image/heic)',
-  })
-  @IsString()
-  @IsNotEmpty()
-  mimeType: string;
-
-  @ApiProperty({
-    enum: ['before', 'after'],
-    example: 'before',
-    description: 'Type of photo (before or after cleaning)',
-  })
-  @IsEnum(['before', 'after'])
-  @IsNotEmpty()
-  type: 'before' | 'after';
-}
+export class GeneratePresignedUrlDto extends createZodDto(GeneratePresignedUrlSchema) {}

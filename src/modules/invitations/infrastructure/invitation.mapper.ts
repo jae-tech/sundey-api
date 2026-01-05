@@ -1,4 +1,4 @@
-import { Invitation as PrismaInvitation } from '@prisma-client';
+import { Invitation as PrismaInvitation } from '@prisma/client';
 import { Invitation } from '../domain/invitation.entity';
 
 export class InvitationMapper {

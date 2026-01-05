@@ -95,6 +95,8 @@ export type ReservationCountAggregateOutputType = {
   paidAmount: number
   isPaid: number
   paymentNote: number
+  items: number
+  metadata: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -170,6 +172,8 @@ export type ReservationCountAggregateInputType = {
   paidAmount?: true
   isPaid?: true
   paymentNote?: true
+  items?: true
+  metadata?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -265,7 +269,7 @@ export type ReservationGroupByOutputType = {
   id: string
   companyId: string
   customerId: string | null
-  serviceId: string
+  serviceId: string | null
   assignedUserId: string | null
   status: $Enums.ReservationStatus
   scheduledAt: Date
@@ -278,6 +282,8 @@ export type ReservationGroupByOutputType = {
   paidAmount: number
   isPaid: boolean
   paymentNote: string | null
+  items: runtime.JsonValue
+  metadata: runtime.JsonValue
   createdAt: Date
   updatedAt: Date
   _count: ReservationCountAggregateOutputType | null
@@ -309,7 +315,7 @@ export type ReservationWhereInput = {
   id?: Prisma.StringFilter<"Reservation"> | string
   companyId?: Prisma.StringFilter<"Reservation"> | string
   customerId?: Prisma.StringNullableFilter<"Reservation"> | string | null
-  serviceId?: Prisma.StringFilter<"Reservation"> | string
+  serviceId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   assignedUserId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   status?: Prisma.EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
@@ -322,20 +328,23 @@ export type ReservationWhereInput = {
   paidAmount?: Prisma.IntFilter<"Reservation"> | number
   isPaid?: Prisma.BoolFilter<"Reservation"> | boolean
   paymentNote?: Prisma.StringNullableFilter<"Reservation"> | string | null
+  items?: Prisma.JsonFilter<"Reservation">
+  metadata?: Prisma.JsonFilter<"Reservation">
   createdAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   assignedUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
-  service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
+  service?: Prisma.XOR<Prisma.ServiceNullableScalarRelationFilter, Prisma.ServiceWhereInput> | null
   job?: Prisma.XOR<Prisma.JobNullableScalarRelationFilter, Prisma.JobWhereInput> | null
+  statusLogs?: Prisma.ReservationStatusLogListRelationFilter
 }
 
 export type ReservationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   customerId?: Prisma.SortOrderInput | Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
@@ -348,6 +357,8 @@ export type ReservationOrderByWithRelationInput = {
   paidAmount?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   paymentNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  items?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   assignedUser?: Prisma.UserOrderByWithRelationInput
@@ -355,6 +366,7 @@ export type ReservationOrderByWithRelationInput = {
   customer?: Prisma.CustomerOrderByWithRelationInput
   service?: Prisma.ServiceOrderByWithRelationInput
   job?: Prisma.JobOrderByWithRelationInput
+  statusLogs?: Prisma.ReservationStatusLogOrderByRelationAggregateInput
 }
 
 export type ReservationWhereUniqueInput = Prisma.AtLeast<{
@@ -364,7 +376,7 @@ export type ReservationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ReservationWhereInput | Prisma.ReservationWhereInput[]
   companyId?: Prisma.StringFilter<"Reservation"> | string
   customerId?: Prisma.StringNullableFilter<"Reservation"> | string | null
-  serviceId?: Prisma.StringFilter<"Reservation"> | string
+  serviceId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   assignedUserId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   status?: Prisma.EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
@@ -377,20 +389,23 @@ export type ReservationWhereUniqueInput = Prisma.AtLeast<{
   paidAmount?: Prisma.IntFilter<"Reservation"> | number
   isPaid?: Prisma.BoolFilter<"Reservation"> | boolean
   paymentNote?: Prisma.StringNullableFilter<"Reservation"> | string | null
+  items?: Prisma.JsonFilter<"Reservation">
+  metadata?: Prisma.JsonFilter<"Reservation">
   createdAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   assignedUser?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
-  service?: Prisma.XOR<Prisma.ServiceScalarRelationFilter, Prisma.ServiceWhereInput>
+  service?: Prisma.XOR<Prisma.ServiceNullableScalarRelationFilter, Prisma.ServiceWhereInput> | null
   job?: Prisma.XOR<Prisma.JobNullableScalarRelationFilter, Prisma.JobWhereInput> | null
+  statusLogs?: Prisma.ReservationStatusLogListRelationFilter
 }, "id">
 
 export type ReservationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   customerId?: Prisma.SortOrderInput | Prisma.SortOrder
-  serviceId?: Prisma.SortOrder
+  serviceId?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   scheduledAt?: Prisma.SortOrder
@@ -403,6 +418,8 @@ export type ReservationOrderByWithAggregationInput = {
   paidAmount?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   paymentNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  items?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ReservationCountOrderByAggregateInput
@@ -419,7 +436,7 @@ export type ReservationScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Reservation"> | string
   companyId?: Prisma.StringWithAggregatesFilter<"Reservation"> | string
   customerId?: Prisma.StringNullableWithAggregatesFilter<"Reservation"> | string | null
-  serviceId?: Prisma.StringWithAggregatesFilter<"Reservation"> | string
+  serviceId?: Prisma.StringNullableWithAggregatesFilter<"Reservation"> | string | null
   assignedUserId?: Prisma.StringNullableWithAggregatesFilter<"Reservation"> | string | null
   status?: Prisma.EnumReservationStatusWithAggregatesFilter<"Reservation"> | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeWithAggregatesFilter<"Reservation"> | Date | string
@@ -432,6 +449,8 @@ export type ReservationScalarWhereWithAggregatesInput = {
   paidAmount?: Prisma.IntWithAggregatesFilter<"Reservation"> | number
   isPaid?: Prisma.BoolWithAggregatesFilter<"Reservation"> | boolean
   paymentNote?: Prisma.StringNullableWithAggregatesFilter<"Reservation"> | string | null
+  items?: Prisma.JsonWithAggregatesFilter<"Reservation">
+  metadata?: Prisma.JsonWithAggregatesFilter<"Reservation">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Reservation"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Reservation"> | Date | string
 }
@@ -449,20 +468,23 @@ export type ReservationCreateInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
   company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
   customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
-  service: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
   job?: Prisma.JobCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateInput = {
   id?: string
   companyId: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -475,9 +497,12 @@ export type ReservationUncheckedCreateInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUpdateInput = {
@@ -493,20 +518,23 @@ export type ReservationUpdateInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
-  service?: Prisma.ServiceUpdateOneRequiredWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
   job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -519,16 +547,19 @@ export type ReservationUncheckedUpdateInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationCreateManyInput = {
   id?: string
   companyId: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -541,6 +572,8 @@ export type ReservationCreateManyInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -558,6 +591,8 @@ export type ReservationUpdateManyMutationInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -566,7 +601,7 @@ export type ReservationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -579,6 +614,8 @@ export type ReservationUncheckedUpdateManyInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -610,6 +647,8 @@ export type ReservationCountOrderByAggregateInput = {
   paidAmount?: Prisma.SortOrder
   isPaid?: Prisma.SortOrder
   paymentNote?: Prisma.SortOrder
+  items?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -861,6 +900,20 @@ export type ReservationUpdateOneRequiredWithoutJobNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReservationUpdateToOneWithWhereWithoutJobInput, Prisma.ReservationUpdateWithoutJobInput>, Prisma.ReservationUncheckedUpdateWithoutJobInput>
 }
 
+export type ReservationCreateNestedOneWithoutStatusLogsInput = {
+  create?: Prisma.XOR<Prisma.ReservationCreateWithoutStatusLogsInput, Prisma.ReservationUncheckedCreateWithoutStatusLogsInput>
+  connectOrCreate?: Prisma.ReservationCreateOrConnectWithoutStatusLogsInput
+  connect?: Prisma.ReservationWhereUniqueInput
+}
+
+export type ReservationUpdateOneRequiredWithoutStatusLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.ReservationCreateWithoutStatusLogsInput, Prisma.ReservationUncheckedCreateWithoutStatusLogsInput>
+  connectOrCreate?: Prisma.ReservationCreateOrConnectWithoutStatusLogsInput
+  upsert?: Prisma.ReservationUpsertWithoutStatusLogsInput
+  connect?: Prisma.ReservationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReservationUpdateToOneWithWhereWithoutStatusLogsInput, Prisma.ReservationUpdateWithoutStatusLogsInput>, Prisma.ReservationUncheckedUpdateWithoutStatusLogsInput>
+}
+
 export type ReservationCreateWithoutAssignedUserInput = {
   id?: string
   status?: $Enums.ReservationStatus
@@ -874,19 +927,22 @@ export type ReservationCreateWithoutAssignedUserInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
   customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
-  service: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
   job?: Prisma.JobCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutAssignedUserInput = {
   id?: string
   companyId: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
   startedAt?: Date | string | null
@@ -898,9 +954,12 @@ export type ReservationUncheckedCreateWithoutAssignedUserInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutAssignedUserInput = {
@@ -936,7 +995,7 @@ export type ReservationScalarWhereInput = {
   id?: Prisma.StringFilter<"Reservation"> | string
   companyId?: Prisma.StringFilter<"Reservation"> | string
   customerId?: Prisma.StringNullableFilter<"Reservation"> | string | null
-  serviceId?: Prisma.StringFilter<"Reservation"> | string
+  serviceId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   assignedUserId?: Prisma.StringNullableFilter<"Reservation"> | string | null
   status?: Prisma.EnumReservationStatusFilter<"Reservation"> | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
@@ -949,6 +1008,8 @@ export type ReservationScalarWhereInput = {
   paidAmount?: Prisma.IntFilter<"Reservation"> | number
   isPaid?: Prisma.BoolFilter<"Reservation"> | boolean
   paymentNote?: Prisma.StringNullableFilter<"Reservation"> | string | null
+  items?: Prisma.JsonFilter<"Reservation">
+  metadata?: Prisma.JsonFilter<"Reservation">
   createdAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Reservation"> | Date | string
 }
@@ -966,18 +1027,21 @@ export type ReservationCreateWithoutCompanyInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
   customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
-  service: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
   job?: Prisma.JobCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutCompanyInput = {
   id?: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -990,9 +1054,12 @@ export type ReservationUncheckedCreateWithoutCompanyInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutCompanyInput = {
@@ -1034,18 +1101,21 @@ export type ReservationCreateWithoutCustomerInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
   company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
-  service: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
   job?: Prisma.JobCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutCustomerInput = {
   id?: string
   companyId: string
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -1058,9 +1128,12 @@ export type ReservationUncheckedCreateWithoutCustomerInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutCustomerInput = {
@@ -1102,12 +1175,15 @@ export type ReservationCreateWithoutServiceInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
   company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
   customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
   job?: Prisma.JobCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutServiceInput = {
@@ -1126,9 +1202,12 @@ export type ReservationUncheckedCreateWithoutServiceInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutServiceInput = {
@@ -1170,19 +1249,22 @@ export type ReservationCreateWithoutJobInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
   company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
   customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
-  service: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  statusLogs?: Prisma.ReservationStatusLogCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationUncheckedCreateWithoutJobInput = {
   id?: string
   companyId: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -1195,8 +1277,11 @@ export type ReservationUncheckedCreateWithoutJobInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  statusLogs?: Prisma.ReservationStatusLogUncheckedCreateNestedManyWithoutReservationInput
 }
 
 export type ReservationCreateOrConnectWithoutJobInput = {
@@ -1228,19 +1313,22 @@ export type ReservationUpdateWithoutJobInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
-  service?: Prisma.ServiceUpdateOneRequiredWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutJobInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1253,15 +1341,15 @@ export type ReservationUncheckedUpdateWithoutJobInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
-export type ReservationCreateManyAssignedUserInput = {
+export type ReservationCreateWithoutStatusLogsInput = {
   id?: string
-  companyId: string
-  customerId?: string | null
-  serviceId: string
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
   startedAt?: Date | string | null
@@ -1273,6 +1361,123 @@ export type ReservationCreateManyAssignedUserInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignedUser?: Prisma.UserCreateNestedOneWithoutAssignedReservationsInput
+  company: Prisma.CompanyCreateNestedOneWithoutReservationsInput
+  customer?: Prisma.CustomerCreateNestedOneWithoutReservationsInput
+  service?: Prisma.ServiceCreateNestedOneWithoutReservationsInput
+  job?: Prisma.JobCreateNestedOneWithoutReservationInput
+}
+
+export type ReservationUncheckedCreateWithoutStatusLogsInput = {
+  id?: string
+  companyId: string
+  customerId?: string | null
+  serviceId?: string | null
+  assignedUserId?: string | null
+  status?: $Enums.ReservationStatus
+  scheduledAt: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  customerName: string
+  customerPhone: string
+  customerEmail?: string | null
+  totalPrice: number
+  paidAmount?: number
+  isPaid?: boolean
+  paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  job?: Prisma.JobUncheckedCreateNestedOneWithoutReservationInput
+}
+
+export type ReservationCreateOrConnectWithoutStatusLogsInput = {
+  where: Prisma.ReservationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReservationCreateWithoutStatusLogsInput, Prisma.ReservationUncheckedCreateWithoutStatusLogsInput>
+}
+
+export type ReservationUpsertWithoutStatusLogsInput = {
+  update: Prisma.XOR<Prisma.ReservationUpdateWithoutStatusLogsInput, Prisma.ReservationUncheckedUpdateWithoutStatusLogsInput>
+  create: Prisma.XOR<Prisma.ReservationCreateWithoutStatusLogsInput, Prisma.ReservationUncheckedCreateWithoutStatusLogsInput>
+  where?: Prisma.ReservationWhereInput
+}
+
+export type ReservationUpdateToOneWithWhereWithoutStatusLogsInput = {
+  where?: Prisma.ReservationWhereInput
+  data: Prisma.XOR<Prisma.ReservationUpdateWithoutStatusLogsInput, Prisma.ReservationUncheckedUpdateWithoutStatusLogsInput>
+}
+
+export type ReservationUpdateWithoutStatusLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
+  customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
+  job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+}
+
+export type ReservationUncheckedUpdateWithoutStatusLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
+  scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  customerName?: Prisma.StringFieldUpdateOperationsInput | string
+  customerPhone?: Prisma.StringFieldUpdateOperationsInput | string
+  customerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalPrice?: Prisma.IntFieldUpdateOperationsInput | number
+  paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+}
+
+export type ReservationCreateManyAssignedUserInput = {
+  id?: string
+  companyId: string
+  customerId?: string | null
+  serviceId?: string | null
+  status?: $Enums.ReservationStatus
+  scheduledAt: Date | string
+  startedAt?: Date | string | null
+  completedAt?: Date | string | null
+  customerName: string
+  customerPhone: string
+  customerEmail?: string | null
+  totalPrice: number
+  paidAmount?: number
+  isPaid?: boolean
+  paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1290,19 +1495,22 @@ export type ReservationUpdateWithoutAssignedUserInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
-  service?: Prisma.ServiceUpdateOneRequiredWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
   job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutAssignedUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1314,16 +1522,19 @@ export type ReservationUncheckedUpdateWithoutAssignedUserInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutAssignedUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1335,6 +1546,8 @@ export type ReservationUncheckedUpdateManyWithoutAssignedUserInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1342,7 +1555,7 @@ export type ReservationUncheckedUpdateManyWithoutAssignedUserInput = {
 export type ReservationCreateManyCompanyInput = {
   id?: string
   customerId?: string | null
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -1355,6 +1568,8 @@ export type ReservationCreateManyCompanyInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1372,18 +1587,21 @@ export type ReservationUpdateWithoutCompanyInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
-  service?: Prisma.ServiceUpdateOneRequiredWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
   job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1396,15 +1614,18 @@ export type ReservationUncheckedUpdateWithoutCompanyInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1417,6 +1638,8 @@ export type ReservationUncheckedUpdateManyWithoutCompanyInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1424,7 +1647,7 @@ export type ReservationUncheckedUpdateManyWithoutCompanyInput = {
 export type ReservationCreateManyCustomerInput = {
   id?: string
   companyId: string
-  serviceId: string
+  serviceId?: string | null
   assignedUserId?: string | null
   status?: $Enums.ReservationStatus
   scheduledAt: Date | string
@@ -1437,6 +1660,8 @@ export type ReservationCreateManyCustomerInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1454,18 +1679,21 @@ export type ReservationUpdateWithoutCustomerInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
-  service?: Prisma.ServiceUpdateOneRequiredWithoutReservationsNestedInput
+  service?: Prisma.ServiceUpdateOneWithoutReservationsNestedInput
   job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1478,15 +1706,18 @@ export type ReservationUncheckedUpdateWithoutCustomerInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  serviceId?: Prisma.StringFieldUpdateOperationsInput | string
+  serviceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumReservationStatusFieldUpdateOperationsInput | $Enums.ReservationStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1499,6 +1730,8 @@ export type ReservationUncheckedUpdateManyWithoutCustomerInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1519,6 +1752,8 @@ export type ReservationCreateManyServiceInput = {
   paidAmount?: number
   isPaid?: boolean
   paymentNote?: string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1536,12 +1771,15 @@ export type ReservationUpdateWithoutServiceInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedUser?: Prisma.UserUpdateOneWithoutAssignedReservationsNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutReservationsNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutReservationsNestedInput
   job?: Prisma.JobUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateWithoutServiceInput = {
@@ -1560,9 +1798,12 @@ export type ReservationUncheckedUpdateWithoutServiceInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   job?: Prisma.JobUncheckedUpdateOneWithoutReservationNestedInput
+  statusLogs?: Prisma.ReservationStatusLogUncheckedUpdateManyWithoutReservationNestedInput
 }
 
 export type ReservationUncheckedUpdateManyWithoutServiceInput = {
@@ -1581,10 +1822,41 @@ export type ReservationUncheckedUpdateManyWithoutServiceInput = {
   paidAmount?: Prisma.IntFieldUpdateOperationsInput | number
   isPaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paymentNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  items?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type ReservationCountOutputType
+ */
+
+export type ReservationCountOutputType = {
+  statusLogs: number
+}
+
+export type ReservationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  statusLogs?: boolean | ReservationCountOutputTypeCountStatusLogsArgs
+}
+
+/**
+ * ReservationCountOutputType without action
+ */
+export type ReservationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReservationCountOutputType
+   */
+  select?: Prisma.ReservationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ReservationCountOutputType without action
+ */
+export type ReservationCountOutputTypeCountStatusLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReservationStatusLogWhereInput
+}
 
 
 export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1604,13 +1876,17 @@ export type ReservationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   paidAmount?: boolean
   isPaid?: boolean
   paymentNote?: boolean
+  items?: boolean
+  metadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
   job?: boolean | Prisma.Reservation$jobArgs<ExtArgs>
+  statusLogs?: boolean | Prisma.Reservation$statusLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReservationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["reservation"]>
 
 export type ReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1630,12 +1906,14 @@ export type ReservationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   paidAmount?: boolean
   isPaid?: boolean
   paymentNote?: boolean
+  items?: boolean
+  metadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
 }, ExtArgs["result"]["reservation"]>
 
 export type ReservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1655,12 +1933,14 @@ export type ReservationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   paidAmount?: boolean
   isPaid?: boolean
   paymentNote?: boolean
+  items?: boolean
+  metadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
 }, ExtArgs["result"]["reservation"]>
 
 export type ReservationSelectScalar = {
@@ -1680,29 +1960,33 @@ export type ReservationSelectScalar = {
   paidAmount?: boolean
   isPaid?: boolean
   paymentNote?: boolean
+  items?: boolean
+  metadata?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "customerId" | "serviceId" | "assignedUserId" | "status" | "scheduledAt" | "startedAt" | "completedAt" | "customerName" | "customerPhone" | "customerEmail" | "totalPrice" | "paidAmount" | "isPaid" | "paymentNote" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
+export type ReservationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "customerId" | "serviceId" | "assignedUserId" | "status" | "scheduledAt" | "startedAt" | "completedAt" | "customerName" | "customerPhone" | "customerEmail" | "totalPrice" | "paidAmount" | "isPaid" | "paymentNote" | "items" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["reservation"]>
 export type ReservationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
   job?: boolean | Prisma.Reservation$jobArgs<ExtArgs>
+  statusLogs?: boolean | Prisma.Reservation$statusLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReservationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReservationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
 }
 export type ReservationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assignedUser?: boolean | Prisma.Reservation$assignedUserArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.Reservation$customerArgs<ExtArgs>
-  service?: boolean | Prisma.ServiceDefaultArgs<ExtArgs>
+  service?: boolean | Prisma.Reservation$serviceArgs<ExtArgs>
 }
 
 export type $ReservationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1711,14 +1995,15 @@ export type $ReservationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     assignedUser: Prisma.$UserPayload<ExtArgs> | null
     company: Prisma.$CompanyPayload<ExtArgs>
     customer: Prisma.$CustomerPayload<ExtArgs> | null
-    service: Prisma.$ServicePayload<ExtArgs>
+    service: Prisma.$ServicePayload<ExtArgs> | null
     job: Prisma.$JobPayload<ExtArgs> | null
+    statusLogs: Prisma.$ReservationStatusLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     companyId: string
     customerId: string | null
-    serviceId: string
+    serviceId: string | null
     assignedUserId: string | null
     status: $Enums.ReservationStatus
     scheduledAt: Date
@@ -1731,6 +2016,8 @@ export type $ReservationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     paidAmount: number
     isPaid: boolean
     paymentNote: string | null
+    items: runtime.JsonValue
+    metadata: runtime.JsonValue
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["reservation"]>
@@ -2130,8 +2417,9 @@ export interface Prisma__ReservationClient<T, Null = never, ExtArgs extends runt
   assignedUser<T extends Prisma.Reservation$assignedUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$assignedUserArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   customer<T extends Prisma.Reservation$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$customerArgs<ExtArgs>>): Prisma.Prisma__CustomerClient<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  service<T extends Prisma.ServiceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServiceDefaultArgs<ExtArgs>>): Prisma.Prisma__ServiceClient<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  service<T extends Prisma.Reservation$serviceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$serviceArgs<ExtArgs>>): Prisma.Prisma__ServiceClient<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   job<T extends Prisma.Reservation$jobArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$jobArgs<ExtArgs>>): Prisma.Prisma__JobClient<runtime.Types.Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  statusLogs<T extends Prisma.Reservation$statusLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Reservation$statusLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReservationStatusLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2177,6 +2465,8 @@ export interface ReservationFieldRefs {
   readonly paidAmount: Prisma.FieldRef<"Reservation", 'Int'>
   readonly isPaid: Prisma.FieldRef<"Reservation", 'Boolean'>
   readonly paymentNote: Prisma.FieldRef<"Reservation", 'String'>
+  readonly items: Prisma.FieldRef<"Reservation", 'Json'>
+  readonly metadata: Prisma.FieldRef<"Reservation", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Reservation", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Reservation", 'DateTime'>
 }
@@ -2613,6 +2903,25 @@ export type Reservation$customerArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * Reservation.service
+ */
+export type Reservation$serviceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Service
+   */
+  select?: Prisma.ServiceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Service
+   */
+  omit?: Prisma.ServiceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceInclude<ExtArgs> | null
+  where?: Prisma.ServiceWhereInput
+}
+
+/**
  * Reservation.job
  */
 export type Reservation$jobArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2629,6 +2938,30 @@ export type Reservation$jobArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.JobInclude<ExtArgs> | null
   where?: Prisma.JobWhereInput
+}
+
+/**
+ * Reservation.statusLogs
+ */
+export type Reservation$statusLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReservationStatusLog
+   */
+  select?: Prisma.ReservationStatusLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReservationStatusLog
+   */
+  omit?: Prisma.ReservationStatusLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReservationStatusLogInclude<ExtArgs> | null
+  where?: Prisma.ReservationStatusLogWhereInput
+  orderBy?: Prisma.ReservationStatusLogOrderByWithRelationInput | Prisma.ReservationStatusLogOrderByWithRelationInput[]
+  cursor?: Prisma.ReservationStatusLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReservationStatusLogScalarFieldEnum | Prisma.ReservationStatusLogScalarFieldEnum[]
 }
 
 /**

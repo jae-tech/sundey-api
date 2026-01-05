@@ -57,3 +57,8 @@ export type Job = Prisma.JobModel
  * 
  */
 export type JobPhoto = Prisma.JobPhotoModel
+/**
+ * Model ReservationStatusLog
+ * 
+ */
+export type ReservationStatusLog = Prisma.ReservationStatusLogModel

@@ -1,4 +1,4 @@
-import { Company as PrismaCompany } from '@prisma-client';
+import { Company as PrismaCompany } from '@prisma/client';
 import { Company } from '../domain/company.entity';
 
 export class CompanyMapper {

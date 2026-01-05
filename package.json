@@ -8,7 +8,8 @@
   "type": "module",
   "scripts": {
     "build": "tsup --minify --env.NODE_ENV production",
-    "dev": "tsx watch src/main.ts",
+    "dev": "node kill-port.js && tsx watch --clear-screen src/main.ts",
+    "dev:clean": "node kill-port.js && pnpm dev",
     "dev:build": "tsup --watch --onSuccess \"node --env-file=.env dist/main.js\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node --env-file=.env dist/main.js",
@@ -19,11 +20,12 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --inspect-port 9229",
-    "test:e2e": "vitest run --config ./vitest.config.ts"
+    "test:e2e": "vitest run --config ./vitest.config.ts",
+    "kill:port": "node kill-port.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.958.0",
-    "@aws-sdk/s3-request-presigner": "^3.958.0",
+    "@aws-sdk/client-s3": "^3.962.0",
+    "@aws-sdk/s3-request-presigner": "^3.962.0",
     "@fastify/static": "^9.0.0",
     "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
@@ -46,14 +48,18 @@
     "dotenv": "^17.2.3",
     "fastify": "^5.6.2",
     "nestjs-pino": "^4.5.0",
+    "nestjs-zod": "^5.1.0",
     "oci-sdk": "^2.122.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.16.3",
     "pino-http": "^11.0.0",
     "pino-pretty": "^13.1.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -65,6 +71,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^25.0.3",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.16.0",

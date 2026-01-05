@@ -4,10 +4,10 @@ import {
   SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  Logger as WsLogger,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Injectable } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
+import { Injectable, Logger } from '@nestjs/common';
 
 /**
  * WebSocket 게이트웨이 - 예약 변경사항을 실시간으로 브로드캐스트
@@ -21,28 +21,24 @@ import { PinoLogger } from 'nestjs-pino';
   namespace: 'reservations',
 })
 @Injectable()
-export class ReservationGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class ReservationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly logger: PinoLogger) {
-    this.logger.setContext(ReservationGateway.name);
-  }
+  private readonly logger = new Logger(ReservationGateway.name);
 
   /**
    * 클라이언트 연결 시
    */
   handleConnection(client: Socket) {
-    this.logger.info(`클라이언트 연결됨: ${client.id}`);
+    this.logger.log(`클라이언트 연결됨: ${client.id}`);
   }
 
   /**
    * 클라이언트 연결 해제 시
    */
   handleDisconnect(client: Socket) {
-    this.logger.info(`클라이언트 연결 해제됨: ${client.id}`);
+    this.logger.log(`클라이언트 연결 해제됨: ${client.id}`);
   }
 
   /**
@@ -54,7 +50,7 @@ export class ReservationGateway
   handleJoinCompany(client: Socket, data: { companyId: string }) {
     const room = `company:${data.companyId}`;
     client.join(room);
-    this.logger.info(`클라이언트 ${client.id} 방 입장: ${room}`);
+    this.logger.log(`클라이언트 ${client.id} 방 입장: ${room}`);
     return { success: true, room };
   }
 
@@ -65,7 +61,7 @@ export class ReservationGateway
   handleLeaveCompany(client: Socket, data: { companyId: string }) {
     const room = `company:${data.companyId}`;
     client.leave(room);
-    this.logger.info(`클라이언트 ${client.id} 방 퇴장: ${room}`);
+    this.logger.log(`클라이언트 ${client.id} 방 퇴장: ${room}`);
     return { success: true };
   }
 
@@ -110,34 +106,40 @@ export class ReservationGateway
   /**
    * 청소 사진 업로드 브로드캐스트
    */
-  broadcastPhotosUploaded(companyId: string, data: {
-    reservationId: string;
-    jobId: string;
-    photos: Array<{
-      id: string;
-      type: string;
-      photoUrl: string;
-      fileName: string;
-      uploadedAt: Date;
-    }>;
-  }) {
+  broadcastPhotosUploaded(
+    companyId: string,
+    data: {
+      reservationId: string;
+      jobId: string;
+      photos: Array<{
+        id: string;
+        type: string;
+        photoUrl: string;
+        fileName: string;
+        uploadedAt: Date;
+      }>;
+    },
+  ) {
     this.broadcastReservationUpdate(companyId, 'photosUploaded', data);
   }
 
   /**
    * 청소 사진 메타데이터 저장 브로드캐스트
    */
-  broadcastPhotosSaved(companyId: string, data: {
-    reservationId: string;
-    jobId: string;
-    savedPhotos: Array<{
-      id: string;
-      type: string;
-      photoUrl: string;
-      fileName: string;
-      uploadedAt: Date;
-    }>;
-  }) {
+  broadcastPhotosSaved(
+    companyId: string,
+    data: {
+      reservationId: string;
+      jobId: string;
+      savedPhotos: Array<{
+        id: string;
+        type: string;
+        photoUrl: string;
+        fileName: string;
+        uploadedAt: Date;
+      }>;
+    },
+  ) {
     this.broadcastReservationUpdate(companyId, 'photosSaved', data);
   }
 }

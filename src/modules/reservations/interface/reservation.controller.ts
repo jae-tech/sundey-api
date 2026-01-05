@@ -5,6 +5,7 @@ import {
   Patch,
   Body,
   Param,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFiles,
@@ -28,6 +29,7 @@ import { GetUnpaidReservationsUseCase } from '../application/get-unpaid-reservat
 import { UploadPhotosUseCase } from '../application/upload-photos.usecase';
 import { GeneratePresignedUrlUseCase } from '../application/generate-presigned-url.usecase';
 import { SaveJobPhotosUseCase } from '../application/save-job-photos.usecase';
+import { GetReservationStatusLogsUseCase } from '../application/get-reservation-status-logs.usecase';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { AssignUserDto } from './dto/assign-user.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -50,6 +52,7 @@ export class ReservationController {
     private readonly uploadPhotosUseCase: UploadPhotosUseCase,
     private readonly generatePresignedUrlUseCase: GeneratePresignedUrlUseCase,
     private readonly saveJobPhotosUseCase: SaveJobPhotosUseCase,
+    private readonly getStatusLogsUseCase: GetReservationStatusLogsUseCase,
   ) {}
 
   @Post()
@@ -88,9 +91,30 @@ export class ReservationController {
     description: '예약 상태를 변경합니다. (대기 중 → 확정 → 진행 중 → 완료)',
   })
   async updateStatus(@Param('id') id: string, @Body() dto: UpdateStatusDto) {
+    // TODO: RequestUser 데코레이터에서 userId 추출
+    const userId = 'temp-user-id';
     return this.updateStatusUseCase.execute({
       reservationId: id,
       status: dto.status,
+      userId,
+      reason: dto.reason,
+    });
+  }
+
+  @Get(':id/status-logs')
+  @ApiOperation({
+    summary: '상태 변경 이력 조회',
+    description: '예약의 모든 상태 변경 이력을 시간 순서로 조회합니다.',
+  })
+  async getStatusLogs(
+    @Param('id') id: string,
+    @Query('skip') skip?: string,
+    @Query('take') take?: string,
+  ) {
+    return this.getStatusLogsUseCase.execute({
+      reservationId: id,
+      skip: skip ? parseInt(skip, 10) : 0,
+      take: take ? parseInt(take, 10) : 20,
     });
   }
 

@@ -1,4 +1,4 @@
-import { Service as PrismaService } from '@prisma-client';
+import { Service as PrismaService } from '@prisma/client';
 import { Service } from '../domain/service.entity';
 
 export class ServiceMapper {

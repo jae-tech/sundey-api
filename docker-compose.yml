@@ -1,21 +1,22 @@
 version: "3.8"
 
+# 공통 설정 (Base)
+# 로컬/프로덕션 모두 사용
+
 services:
   postgres:
     image: postgres:17-alpine
     container_name: sundey-postgres
     environment:
-      POSTGRES_USER: sundey
-      POSTGRES_PASSWORD: sundey123
-      POSTGRES_DB: sundey_crm
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-sundey}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sundey123}
+      POSTGRES_DB: ${POSTGRES_DB:-sundey_crm}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - sundey-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sundey"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sundey}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,8 +24,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: sundey-redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -39,20 +38,20 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     container_name: sundey-api
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      DATABASE_URL: postgresql://sundey:sundey123@postgres:5432/sundey_crm?schema=public
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
-      JWT_EXPIRES_IN: 1h
-      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-this-in-production
-      JWT_REFRESH_EXPIRES_IN: 7d
-      CORS_ORIGIN: http://localhost:3001
-    ports:
-      - "3000:3000"
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      CORS_ORIGIN: ${CORS_ORIGIN}
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,12 +65,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     container_name: sundey-worker
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://sundey:sundey123@postgres:5432/sundey_crm?schema=public
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
     depends_on:
       postgres:
         condition: service_healthy
@@ -80,18 +81,6 @@ services:
     networks:
       - sundey-network
     command: echo "Worker process - configure your queue processor here"
-
-  nginx:
-    image: nginx:alpine
-    container_name: sundey-nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - api
-    networks:
-      - sundey-network
 
 networks:
   sundey-network:

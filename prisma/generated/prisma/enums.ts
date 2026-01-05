@@ -46,3 +46,13 @@ export const PhotoType = {
 } as const
 
 export type PhotoType = (typeof PhotoType)[keyof typeof PhotoType]
+
+
+export const PaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  MOBILE_PAY: 'MOBILE_PAY'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

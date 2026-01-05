@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ReservationStatus as PrismaReservationStatus } from '@prisma-client';
-import { PrismaService } from '@modules/queue/infrastructure/prisma.service';
+import { ReservationStatus as PrismaReservationStatus } from '@prisma/client';
+import { PrismaService } from '@modules/common/infrastructure/prisma/prisma.service';
 import { IReservationRepository } from '@core/ports/reservation.repository.port';
 import { Reservation } from '../domain/reservation.entity';
 import { ReservationMapper } from './reservation.mapper';
+import { ReservationItem, ReservationMetadata } from '../domain/reservation-item.interface';
 
 @Injectable()
 export class PrismaReservationAdapter implements IReservationRepository {
@@ -47,12 +48,14 @@ export class PrismaReservationAdapter implements IReservationRepository {
 
   async create(data: {
     companyId: string;
-    serviceId: string;
+    serviceId?: string;
     scheduledAt: Date;
     customerName: string;
     customerPhone: string;
     customerEmail?: string;
     totalPrice: number;
+    items?: ReservationItem[];
+    metadata?: ReservationMetadata;
     status?: string;
   }): Promise<Reservation> {
     const result = await this.prisma.reservation.create({
@@ -64,6 +67,8 @@ export class PrismaReservationAdapter implements IReservationRepository {
         customerPhone: data.customerPhone,
         customerEmail: data.customerEmail,
         totalPrice: data.totalPrice,
+        items: data.items || [],
+        metadata: data.metadata || {},
         status: (data.status as PrismaReservationStatus) || 'PENDING_INQUIRY',
       },
     });
@@ -82,6 +87,8 @@ export class PrismaReservationAdapter implements IReservationRepository {
       paidAmount: number;
       isPaid: boolean;
       paymentNote: string;
+      items: ReservationItem[];
+      metadata: ReservationMetadata;
     }>,
   ): Promise<Reservation> {
     const updateData: Partial<{
@@ -93,6 +100,8 @@ export class PrismaReservationAdapter implements IReservationRepository {
       paidAmount: number;
       isPaid: boolean;
       paymentNote: string;
+      items: ReservationItem[];
+      metadata: ReservationMetadata;
     }> = {};
 
     if (data.customerId !== undefined) updateData.customerId = data.customerId;
@@ -103,6 +112,8 @@ export class PrismaReservationAdapter implements IReservationRepository {
     if (data.paidAmount !== undefined) updateData.paidAmount = data.paidAmount;
     if (data.isPaid !== undefined) updateData.isPaid = data.isPaid;
     if (data.paymentNote !== undefined) updateData.paymentNote = data.paymentNote;
+    if (data.items !== undefined) updateData.items = data.items;
+    if (data.metadata !== undefined) updateData.metadata = data.metadata;
 
     const result = await this.prisma.reservation.update({
       where: { id },

@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
+import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosError } from 'axios';
 import { OciSignatureUtil } from '@common/utils/oci-signature.util';
 
 export interface UploadFileInput {
   companyId: string;
   jobId: string;
-  file: Fastify.Multer.File;
+  file: Express.Multer.File;
   type: 'before' | 'after';
 }
 
@@ -22,15 +21,14 @@ export interface UploadFileOutput {
  */
 @Injectable()
 export class FileUploadService {
+  private readonly logger = new Logger(FileUploadService.name);
   private readonly namespace: string;
   private readonly bucketName: string;
   private readonly region: string;
   private readonly signatureUtil: OciSignatureUtil;
   private readonly baseUrl: string;
 
-  constructor(private readonly logger: PinoLogger) {
-    this.logger.setContext(FileUploadService.name);
-
+  constructor() {
     this.namespace = process.env.OCI_NAMESPACE || '';
     this.bucketName = process.env.OCI_BUCKET_NAME || '';
     this.region = process.env.OCI_REGION || '';
@@ -69,7 +67,7 @@ export class FileUploadService {
       // 파일 업로드
       await this.putObject(objectName, input.file.buffer);
 
-      this.logger.info(`파일 업로드 성공: ${objectName}`);
+      this.logger.log(`파일 업로드 성공: ${objectName}`);
 
       return {
         objectName,
@@ -77,7 +75,10 @@ export class FileUploadService {
         bucket: this.bucketName,
       };
     } catch (error) {
-      this.logger.error(`파일 업로드 실패: ${error.message}`, error.stack);
+      this.logger.error(
+        `파일 업로드 실패: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : '',
+      );
       throw error;
     }
   }

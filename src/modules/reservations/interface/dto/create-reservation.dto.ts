@@ -1,33 +1,36 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, IsDateString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class CreateReservationDto {
-  @ApiProperty({ example: 'company-uuid' })
-  @IsString()
-  companyId: string;
+export const CreateReservationSchema = z.object({
+  companyId: z
+    .string()
+    .min(1, { message: 'Company ID is required' })
+    .describe('Company ID'),
+  services: z
+    .array(
+      z.object({
+        serviceId: z.string().min(1, { message: 'Service ID is required' }),
+        quantity: z.number().int().min(1, { message: 'Quantity must be at least 1' }).optional().default(1),
+      }),
+    )
+    .min(1, { message: 'At least one service is required' })
+    .describe('Services with quantity'),
+  scheduledAt: z.coerce
+    .date({ message: 'Invalid date format' })
+    .describe('Scheduled date and time'),
+  customerName: z
+    .string()
+    .min(1, { message: 'Customer name is required' })
+    .describe('Customer name'),
+  customerPhone: z
+    .string()
+    .min(1, { message: 'Customer phone is required' })
+    .describe('Customer phone number'),
+  customerEmail: z.string().optional().describe('Customer email address'),
+  metadata: z
+    .record(z.any())
+    .optional()
+    .describe('Optional metadata for the reservation'),
+});
 
-  @ApiProperty({ example: 'service-uuid' })
-  @IsString()
-  serviceId: string;
-
-  @ApiProperty({ example: '2025-11-25T10:00:00Z' })
-  @IsDateString()
-  scheduledAt: Date;
-
-  @ApiProperty({ example: 'John Doe' })
-  @IsString()
-  customerName: string;
-
-  @ApiProperty({ example: '010-1234-5678' })
-  @IsString()
-  customerPhone: string;
-
-  @ApiProperty({ example: 'customer@example.com', required: false })
-  @IsString()
-  @IsOptional()
-  customerEmail?: string;
-
-  @ApiProperty({ example: 30000 })
-  @IsNumber()
-  totalPrice: number;
-}
+export class CreateReservationDto extends createZodDto(CreateReservationSchema) {}

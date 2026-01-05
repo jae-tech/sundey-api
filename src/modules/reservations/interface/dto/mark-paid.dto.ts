@@ -1,14 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsOptional, Min } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class MarkPaidDto {
-  @ApiProperty({ example: 30000 })
-  @IsNumber()
-  @Min(0)
-  paidAmount: number;
+export const MarkPaidSchema = z.object({
+  paidAmount: z.number().min(0, { message: 'Paid amount must be non-negative' }).describe('Amount paid'),
+  paymentNote: z.string().optional().describe('Payment note'),
+});
 
-  @ApiProperty({ example: 'Cash payment', required: false })
-  @IsString()
-  @IsOptional()
-  paymentNote?: string;
-}
+export class MarkPaidDto extends createZodDto(MarkPaidSchema) {}

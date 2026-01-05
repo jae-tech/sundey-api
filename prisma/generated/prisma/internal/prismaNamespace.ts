@@ -391,7 +391,8 @@ export const ModelName = {
   Service: 'Service',
   Reservation: 'Reservation',
   Job: 'Job',
-  JobPhoto: 'JobPhoto'
+  JobPhoto: 'JobPhoto',
+  ReservationStatusLog: 'ReservationStatusLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "company" | "invitation" | "customer" | "service" | "reservation" | "job" | "jobPhoto"
+    modelProps: "user" | "company" | "invitation" | "customer" | "service" | "reservation" | "job" | "jobPhoto" | "reservationStatusLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1004,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ReservationStatusLog: {
+      payload: Prisma.$ReservationStatusLogPayload<ExtArgs>
+      fields: Prisma.ReservationStatusLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReservationStatusLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReservationStatusLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        findFirst: {
+          args: Prisma.ReservationStatusLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReservationStatusLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        findMany: {
+          args: Prisma.ReservationStatusLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>[]
+        }
+        create: {
+          args: Prisma.ReservationStatusLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        createMany: {
+          args: Prisma.ReservationStatusLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReservationStatusLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>[]
+        }
+        delete: {
+          args: Prisma.ReservationStatusLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        update: {
+          args: Prisma.ReservationStatusLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReservationStatusLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReservationStatusLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReservationStatusLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReservationStatusLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReservationStatusLogPayload>
+        }
+        aggregate: {
+          args: Prisma.ReservationStatusLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReservationStatusLog>
+        }
+        groupBy: {
+          args: Prisma.ReservationStatusLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReservationStatusLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReservationStatusLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReservationStatusLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1087,6 +1162,7 @@ export const CustomerScalarFieldEnum = {
   phone: 'phone',
   email: 'email',
   companyId: 'companyId',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1125,6 +1201,8 @@ export const ReservationScalarFieldEnum = {
   paidAmount: 'paidAmount',
   isPaid: 'isPaid',
   paymentNote: 'paymentNote',
+  items: 'items',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1160,6 +1238,19 @@ export const JobPhotoScalarFieldEnum = {
 export type JobPhotoScalarFieldEnum = (typeof JobPhotoScalarFieldEnum)[keyof typeof JobPhotoScalarFieldEnum]
 
 
+export const ReservationStatusLogScalarFieldEnum = {
+  id: 'id',
+  reservationId: 'reservationId',
+  previousStatus: 'previousStatus',
+  newStatus: 'newStatus',
+  changedByUserId: 'changedByUserId',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ReservationStatusLogScalarFieldEnum = (typeof ReservationStatusLogScalarFieldEnum)[keyof typeof ReservationStatusLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1168,12 +1259,28 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 export const NullsOrder = {
@@ -1236,6 +1343,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1411,6 +1532,7 @@ export type GlobalOmitConfig = {
   reservation?: Prisma.ReservationOmit
   job?: Prisma.JobOmit
   jobPhoto?: Prisma.JobPhotoOmit
+  reservationStatusLog?: Prisma.ReservationStatusLogOmit
 }
 
 /* Types for Logging */

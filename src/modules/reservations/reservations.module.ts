@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CustomersModule } from '@modules/customers/customers.module';
-import { RESERVATION_REPOSITORY, JOB_REPOSITORY } from '@core/ports/tokens';
+import { ServicesModule } from '@modules/services/services.module';
+import { RESERVATION_REPOSITORY, JOB_REPOSITORY, RESERVATION_STATUS_LOG_REPOSITORY } from '@core/ports/tokens';
 import { PrismaReservationAdapter } from './infrastructure/prisma-reservation.adapter';
 import { PrismaJobAdapter } from './infrastructure/prisma-job.adapter';
+import { PrismaReservationStatusLogAdapter } from './infrastructure/prisma-reservation-status-log.adapter';
 import { FileUploadService } from './infrastructure/file-upload.service';
 import { PresignedUrlService } from './infrastructure/presigned-url.service';
 import { CreateReservationUseCase } from './application/create-reservation.usecase';
@@ -15,12 +17,13 @@ import { GetUnpaidReservationsUseCase } from './application/get-unpaid-reservati
 import { UploadPhotosUseCase } from './application/upload-photos.usecase';
 import { GeneratePresignedUrlUseCase } from './application/generate-presigned-url.usecase';
 import { SaveJobPhotosUseCase } from './application/save-job-photos.usecase';
+import { GetReservationStatusLogsUseCase } from './application/get-reservation-status-logs.usecase';
 import { CleanupOrphanPhotosJob } from './application/cleanup-orphan-photos.job';
 import { ReservationController } from './interface/reservation.controller';
 import { ReservationGateway } from './interface/reservation.gateway';
 
 @Module({
-  imports: [ConfigModule, CustomersModule],
+  imports: [ConfigModule, CustomersModule, ServicesModule],
   controllers: [ReservationController],
   providers: [
     {
@@ -30,6 +33,10 @@ import { ReservationGateway } from './interface/reservation.gateway';
     {
       provide: JOB_REPOSITORY,
       useClass: PrismaJobAdapter,
+    },
+    {
+      provide: RESERVATION_STATUS_LOG_REPOSITORY,
+      useClass: PrismaReservationStatusLogAdapter,
     },
     ReservationGateway,
     FileUploadService,
@@ -43,6 +50,7 @@ import { ReservationGateway } from './interface/reservation.gateway';
     UploadPhotosUseCase,
     GeneratePresignedUrlUseCase,
     SaveJobPhotosUseCase,
+    GetReservationStatusLogsUseCase,
     // CleanupOrphanPhotosJob,
   ],
   exports: [RESERVATION_REPOSITORY, ReservationGateway],

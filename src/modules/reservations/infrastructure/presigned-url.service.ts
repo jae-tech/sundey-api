@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
+import { Injectable, Logger } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -21,9 +20,9 @@ export interface PresignedUrlOutput {
 export class PresignedUrlService {
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
+  private readonly logger = new Logger(PresignedUrlService.name);
 
-  constructor(private readonly logger: PinoLogger) {
-    this.logger.setContext(PresignedUrlService.name);
+  constructor() {
 
     const endpoint = process.env.OCI_S3_ENDPOINT;
     const accessKeyId = process.env.OCI_ACCESS_KEY_ID || '';
@@ -67,7 +66,7 @@ export class PresignedUrlService {
         expiresIn: 3600,
       });
 
-      this.logger.info(`프리사인 URL 생성 성공: ${objectName}`);
+      this.logger.log(`프리사인 URL 생성 성공: ${objectName}`);
 
       return {
         presignedUrl,
@@ -76,8 +75,8 @@ export class PresignedUrlService {
       };
     } catch (error) {
       this.logger.error(
-        `프리사인 URL 생성 실패: ${error.message}`,
-        error.stack,
+        `프리사인 URL 생성 실패: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : '',
       );
       throw error;
     }
